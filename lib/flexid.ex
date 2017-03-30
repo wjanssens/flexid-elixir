@@ -55,9 +55,10 @@ defmodule FlexId do
       yr = round(ms / 1000 / 60 / 60 / 24 / 365)
       fr = DateTime.from_unix! state.epoch, :millisecond
       to = DateTime.from_unix! (state.epoch + ms), :millisecond
-      seq = :math.pow 2, state.sequence_bits
-      shd = :math.pow 2, state.shard_bits
+      seq = round(:math.pow 2, state.sequence_bits)
+      shd = round(:math.pow 2, state.shard_bits)
       Logger.info "Ids have a time range of #{yr} years (#{fr} to #{to}), #{seq} sequences, #{shd} shards"
+      state
    end)
   end
 

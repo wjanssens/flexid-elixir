@@ -3,6 +3,7 @@ defmodule FlexIdTest do
 
   test "defaults" do
     {:ok, fid} = FlexId.start_link()
+    FlexId.log(fid)
     sh = FlexId.make_shard("test")
     assert 0xBBD3 == sh
 
