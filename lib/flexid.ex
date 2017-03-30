@@ -9,7 +9,7 @@ defmodule FlexId do
   defstruct sequence_bits: 8,
             shard_bits: 8,
             sequence_mask: 0xFF,
-            shard_mask: 0xfF,
+            shard_mask: 0xFF,
             epoch: 0,
             sequence: 0
 
@@ -17,20 +17,18 @@ defmodule FlexId do
     Agent.start_link(fn -> %FlexId{} end)
   end
 
-  def set_sequence_bits(agent, bits) when bits >= 0 and bits < 15 do
-    Agent.update(agent, fn state -> %{state | sequence_bits: bits, sequence_mask: make_mask(bits)} end)
-  end
-
-  def set_shard_bits(agent, bits) when bits >=0 and bits < 15 do
-    Agent.update(agent, fn state -> %{state | shard_bits: bits, shard_mask: make_mask(bits)} end)
+  def start_link(epoch, sequence_bits, shard_bits) do
+    Agent.start_link(fn -> %FlexId{
+      epoch: epoch,
+      sequence_bits: sequence_bits,
+      sequence_mask: make_mask(sequence_bits),
+      shard_bits: shard_bits,
+      shard_mask: make_mask(shard_bits)
+    } end)
   end
 
   def set_sequence(agent, seq) do
     Agent.update(agent, fn state -> %{state | sequence: seq} end)
-  end
-
-  def set_epoch(agent, epoch) do
-    Agent.update(agent, fn state -> %{state | epoch: epoch} end)
   end
 
   def extract_raw_millis(agent, value) do
@@ -63,11 +61,11 @@ defmodule FlexId do
   end
 
   defp make_mask(bits) do
-    Enum.reduce(1..bits, 0, fn {_, m} -> (m <<< 1) ||| 1 end)
+    Enum.reduce(1..bits, 0, fn(_, acc) -> (acc <<< 1) ||| 1 end)
   end
 
   @doc """
-  Helper for generating a 16-bit shard value from the last two bytes of the sha1 hash of a text value
+  Helper for generating a 16-bit shard value from the last two bytes of the sha1 hash of a text value.
 
   ## Examples
       shard = FlexId.make_shard("username")
