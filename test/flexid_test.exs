@@ -4,7 +4,7 @@ defmodule FlexIdTest do
   test "defaults" do
     {:ok, fid} = FlexId.start_link()
     FlexId.log(fid)
-    sh = FlexId.make_shard("test")
+    sh = FlexId.make_partition("test")
     assert 0xBBD3 == sh
 
     v1 = FlexId.generate(fid, sh)
@@ -12,7 +12,7 @@ defmodule FlexIdTest do
     now = :os.system_time(:millisecond)
     assert now - FlexId.extract_millis(fid, v1) < 5
     assert 0x00 == FlexId.extract_sequence(fid, v1)
-    assert 0xD3 == FlexId.extract_shard(fid, v1)
+    assert 0x13 == FlexId.extract_partition(fid, v1)
 
     v2 = FlexId.generate(fid, sh)
     assert 0x01 == FlexId.extract_sequence(fid, v2)
@@ -21,7 +21,7 @@ defmodule FlexIdTest do
   test "eights" do
     {:ok, fid} = FlexId.start_link(0, 8, 8, 0)
     FlexId.log(fid)
-    sh = FlexId.make_shard("test")
+    sh = FlexId.make_partition("test")
     assert 0xBBD3 == sh
 
     v1 = FlexId.generate(fid, sh)
@@ -29,7 +29,7 @@ defmodule FlexIdTest do
     now = :os.system_time(:millisecond)
     assert now - FlexId.extract_millis(fid, v1) < 5
     assert 0x00 == FlexId.extract_sequence(fid, v1)
-    assert 0xD3 == FlexId.extract_shard(fid, v1)
+    assert 0xD3 == FlexId.extract_partition(fid, v1)
 
     v2 = FlexId.generate(fid, sh)
     assert 0x01 == FlexId.extract_sequence(fid, v2)
@@ -38,7 +38,7 @@ defmodule FlexIdTest do
   test "sixes" do
     {:ok, fid} = FlexId.start_link(0, 6, 6, 4)
     FlexId.log(fid)
-    sh = FlexId.make_shard("test")
+    sh = FlexId.make_partition("test")
     assert 0xBBD3 == sh
 
     v1 = FlexId.generate(fid, sh)
@@ -46,7 +46,7 @@ defmodule FlexIdTest do
     now = :os.system_time(:millisecond)
     assert now - FlexId.extract_millis(fid, v1) < 5
     assert 0x00 == FlexId.extract_sequence(fid, v1)
-    assert 0x13 == FlexId.extract_shard(fid, v1)
+    assert 0x13 == FlexId.extract_partition(fid, v1)
 
     v2 = FlexId.generate(fid, sh)
     assert 0x01 == FlexId.extract_sequence(fid, v2)
