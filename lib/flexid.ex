@@ -13,7 +13,8 @@ defmodule FlexId do
             partition_mask: 0xFF,
             checksum_mask: 0x0F,
             epoch: 946_684_800_000,
-            sequence: 0
+            seq: 0,
+            ms: 0
 
   @doc """
   Start an agent that can be used generate IDs with the given parameters.
@@ -54,10 +55,6 @@ defmodule FlexId do
       checksum_bits: checksum_bits,
       checksum_mask: make_mask(checksum_bits)
     }
-  end
-
-  def set_sequence(agent, seq) do
-    Agent.update(agent, fn state -> %{state | sequence: seq} end)
   end
 
   def extract_raw_millis(agent, value) do
@@ -134,17 +131,17 @@ defmodule FlexId do
   """
   def generate(agent, partition) when is_integer(partition) do
     Agent.get_and_update(agent, fn state ->
-      millis = :os.system_time(:millisecond) - state.epoch
+      ms = :os.system_time(:millisecond) - state.epoch
+      seq = if state.ms == ms, do: state.seq + 1, else: 0
 
       value =
-        millis <<< (state.sequence_bits + state.partition_bits + state.checksum_bits) |||
-          (state.sequence &&& state.sequence_mask) <<<
-            (state.partition_bits + state.checksum_bits) |||
+        ms <<< (state.sequence_bits + state.partition_bits + state.checksum_bits) |||
+          (seq &&& state.sequence_mask) <<< (state.partition_bits + state.checksum_bits) |||
           (partition &&& state.partition_mask) <<< state.checksum_bits
 
       value = if state.checksum_bits == 4, do: checksum(value), else: value
 
-      {value, %{state | sequence: state.sequence + 1}}
+      {value, state |> Map.put(:seq, seq) |> Map.put(:ms, ms)}
     end)
   end
 
