@@ -133,10 +133,15 @@ defmodule FlexId do
     Agent.get_and_update(agent, fn state ->
       ms = :os.system_time(:millisecond) - state.epoch
       seq = if state.ms == ms, do: state.seq + 1, else: 0
+      masked_seq = seq &&& state.sequence_mask
+
+      if seq > 0 && masked_seq == 0 do
+        raise("sequence overflow")
+      end
 
       value =
         ms <<< (state.sequence_bits + state.partition_bits + state.checksum_bits) |||
-          (seq &&& state.sequence_mask) <<< (state.partition_bits + state.checksum_bits) |||
+          masked_seq <<< (state.partition_bits + state.checksum_bits) |||
           (partition &&& state.partition_mask) <<< state.checksum_bits
 
       value = if state.checksum_bits == 4, do: checksum(value), else: value
