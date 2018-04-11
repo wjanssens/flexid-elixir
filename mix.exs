@@ -8,7 +8,28 @@ defmodule FlexId.Mixfile do
       elixir: "~> 1.4",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
+      description: description(),
+      package: package(),
       deps: deps()
+    ]
+  end
+
+  def description do
+    """
+    Generator for distributed time-based ids.
+    Ids are composed of time in ms, sequence counter, partition/shard, checksum.
+    """
+  end
+
+  defp package do
+    [
+      files: ["lib", "mix.exs", "README.md"],
+      maintainers: ["Warren Janssens"],
+      licenses: ["MIT"],
+      links: %{
+        "GitHub" => "https://github.com/wjanssens/flexid-elixir",
+        "Docs" => "http://hexdocs.pm/flexid/"
+      }
     ]
   end
 
