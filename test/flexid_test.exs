@@ -2,54 +2,55 @@ defmodule FlexIdTest do
   use ExUnit.Case, async: true
 
   test "defaults" do
-    {:ok, fid} = FlexId.start_link()
-    FlexId.log(fid)
+    {:ok, pid} = FlexId.start_link()
+
+    FlexId.log(pid)
     sh = FlexId.make_partition("test")
     assert 0xBBD3 == sh
 
-    v1 = FlexId.generate(fid, sh)
+    v1 = FlexId.generate(pid, sh)
 
     now = :os.system_time(:millisecond)
-    assert now - FlexId.extract_millis(fid, v1) < 5
-    assert 0x00 == FlexId.extract_sequence(fid, v1)
-    assert 0x13 == FlexId.extract_partition(fid, v1)
+    assert now - FlexId.extract_millis(pid, v1) < 5
+    assert 0x00 == FlexId.extract_sequence(pid, v1)
+    assert 0x13 == FlexId.extract_partition(pid, v1)
 
-    v2 = FlexId.generate(fid, sh)
-    assert 0x01 == FlexId.extract_sequence(fid, v2)
+    v2 = FlexId.generate(pid, sh)
+    assert 0x01 == FlexId.extract_sequence(pid, v2)
   end
 
   test "eights" do
-    {:ok, fid} = FlexId.start_link(0, 8, 8, 0)
-    FlexId.log(fid)
+    {:ok, _} = FlexId.start_link(0, 8, 8, 0, name: :test)
+    FlexId.log(:test)
     sh = FlexId.make_partition("test")
     assert 0xBBD3 == sh
 
-    v1 = FlexId.generate(fid, sh)
+    v1 = FlexId.generate(:test, sh)
 
     now = :os.system_time(:millisecond)
-    assert now - FlexId.extract_millis(fid, v1) < 5
-    assert 0x00 == FlexId.extract_sequence(fid, v1)
-    assert 0xD3 == FlexId.extract_partition(fid, v1)
+    assert now - FlexId.extract_millis(:test, v1) < 5
+    assert 0x00 == FlexId.extract_sequence(:test, v1)
+    assert 0xD3 == FlexId.extract_partition(:test, v1)
 
-    v2 = FlexId.generate(fid, sh)
-    assert 0x01 == FlexId.extract_sequence(fid, v2)
+    v2 = FlexId.generate(:test, sh)
+    assert 0x01 == FlexId.extract_sequence(:test, v2)
   end
 
   test "sixes" do
-    {:ok, fid} = FlexId.start_link(0, 6, 6, 4)
-    FlexId.log(fid)
+    {:ok, pid} = FlexId.start_link(0, 6, 6, 4)
+    FlexId.log(pid)
     sh = FlexId.make_partition("test")
     assert 0xBBD3 == sh
 
-    v1 = FlexId.generate(fid, sh)
+    v1 = FlexId.generate(pid, sh)
 
     now = :os.system_time(:millisecond)
-    assert now - FlexId.extract_millis(fid, v1) < 5
-    assert 0x00 == FlexId.extract_sequence(fid, v1)
-    assert 0x13 == FlexId.extract_partition(fid, v1)
+    assert now - FlexId.extract_millis(pid, v1) < 5
+    assert 0x00 == FlexId.extract_sequence(pid, v1)
+    assert 0x13 == FlexId.extract_partition(pid, v1)
 
-    v2 = FlexId.generate(fid, sh)
-    assert 0x01 == FlexId.extract_sequence(fid, v2)
+    v2 = FlexId.generate(pid, sh)
+    assert 0x01 == FlexId.extract_sequence(pid, v2)
   end
 
   test "checksum" do

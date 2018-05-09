@@ -103,10 +103,28 @@ by adding `flexid` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [{:flexid, "~> 0.1.0"}]
+  [{:flexid, "~> 0.1.1"}]
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/flexid](https://hexdocs.pm/flexid).
+## Quick Start
+
+Supervise the FlexId agent and give it a name that you can use to look it up in your application:
+```
+supervisor(FlexId, [946_684_800_000, 6, 6, 4, [name: :id_generator]])
+```
+
+Anywhere you need a new ID (eg. an Ecto module):
+```
+    shard = FlexId.make_partition(username)
+    id = FlexId.generate(:id_generator, shard)
+```
+or
+```
+    shard = FlexId.extract_partition(:id_generator, owner_id)
+    id = FlexId.generate(:id_generator, shard)
+```
+
+## Documentation
+
+Documentation can be found at [https://hexdocs.pm/flexid](https://hexdocs.pm/flexid).

@@ -48,9 +48,10 @@ defmodule FlexId do
         epoch \\ 946_684_800_000,
         sequence_bits \\ 6,
         partition_bits \\ 6,
-        checksum_bits \\ 4
+        checksum_bits \\ 4,
+        opts \\ []
       ) do
-    Agent.start_link(FlexId, :start_state, [epoch, sequence_bits, partition_bits, checksum_bits])
+    Agent.start_link(FlexId, :start_state, [epoch, sequence_bits, partition_bits, checksum_bits], opts)
   end
 
   @doc """
